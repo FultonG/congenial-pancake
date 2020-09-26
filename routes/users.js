@@ -1,86 +1,90 @@
 const router = require("express").Router();
 const User = require("../models/user");
-const auth = require("../middleware/auth");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const { response } = require("express");
+const capitalAPI = process.env.CAPITALONE_KEY;
+const saltRounds = 10;
 
-router.get("/get", auth.authJWT, (req, res) => {
-  const completed = Boolean(req.query.completed) || null;
-  const filter = completed ? { completed } : null;
+router.post("/create", async (req, res) => {
+  const userData = req.body.userData;
+  let {
+    username,
+    password,
+    customer_id,
+    account_id,
+    balance,
+    ...customer
+  } = req.body.userData;
 
-  User.find(filter, (err, users) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    return res.send(users);
+  if (!userData) {
+    return res.status(400).send({ msg: "User data not passed" });
+  }
+
+  const usernameTaken = await User.find({ username });
+  if (usernameTaken.length) {
+    return res.status(400).send({ msg: "Username taken" });
+  }
+
+  await axios
+    .post(
+      `http://api.reimaginebanking.com/customers?key=${capitalAPI}`,
+      customer
+    )
+    .then((response) => {
+      const { _id, ...customerData } = response.data.objectCreated;
+      customer = { ...customerData, customer_id: _id };
+    })
+    .catch((err) => res.status(500).send({ err }));
+
+  const account = {
+    type: "Credit Card",
+    nickname: username,
+    rewards: 0,
+    balance: 100,
+  };
+
+  await axios
+    .post(
+      `http://api.reimaginebanking.com/customers/${customer.customer_id}/accounts?key=${capitalAPI}`,
+      account
+    )
+    .then((response) => {
+      const { _id } = response.data.objectCreated;
+      account_id = _id;
+    })
+    .catch((err) => res.send(500).send({ err }));
+
+  const hash = await bcrypt.hash(password, saltRounds);
+  const user = await User.create({
+    ...customer,
+    username,
+    password: hash,
+    account_id,
+    balance: account.balance,
   });
+
+  const token = jwt.sign({ user }, process.env.JWT_SECRET, {
+    expiresIn: "24h",
+  });
+  return res.send({ user, token });
 });
 
-router.get("/get/:tag/:vendor", auth.authJWT, (req, res) => {
-  const licenseTag = req.params.tag;
-  const vendorName = req.params.vendor;
+router.post("/login", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
 
-  User.findOne({ vendorName, licenseTag }, (err, user) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    return res.send(user);
+  const user = await User.findOne({ username });
+  const comparePwd = await bcrypt.compare(password.user.password);
+  if (!comparePwd) {
+    return res.status(400).send({ msg: "Incorrect password" });
+  }
+
+  const token = jwt.sign({ user }, process.env.JWT_SECRET, {
+    expiresIn: "24h",
   });
-});
-
-router.post("/create", (req, res) => {
-  const vendorName = req.body.vendorName;
-  const licenseTag = req.body.licenseTag;
-
-  User.find({ vendorName, licenseTag }, (err, user) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    if (!user.length) {
-      User.create(
-        { vendorName, licenseTag, completed: false },
-        (err, create) => {
-          if (err) {
-            return res.status(500).send({ err });
-          }
-          return res.send(create);
-        }
-      );
-    } else {
-      return rres.send({ msg: "User already exists" });
-    }
-  });
-});
-
-router.put("/complete/:tag/:vendor", auth.authJWT, (req, res) => {
-  const licenseTag = req.params.tag;
-  const vendorName = req.params.vendor;
-
-  User.updateOne(
-    { vendorName, licenseTag },
-    { completed: true },
-    (err, update) => {
-      if (err) {
-        return rres.status(500).send({ err });
-      }
-      User.findOne({ licenseTag }, (err, user) => {
-        if (err) {
-          return res.status(500).send({ err });
-        }
-        return res.send(user);
-      });
-    }
-  );
-});
-
-router.delete("/delete", auth.authJWT, (req, res) => {
-  const licenseTag = req.body.licenseTag;
-  const vendorName = req.body.vendorName;
-
-  User.deleteOne({ vendorName, licenseTag }, (err) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    return res.send({ msg: "User deleted" });
-  });
+  return res.send({ user, token });
 });
 
 module.exports = router;
