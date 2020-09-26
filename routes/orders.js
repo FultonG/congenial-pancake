@@ -8,7 +8,9 @@ router.get("/all", auth.authJWT, async (req, res) => {
 
   const orders = await Order.find({});
   if (status) {
-    const statusOrders = orders.filter((order) => order.status == status);
+    const statusOrders = orders.filter(
+      (order) => order.status.toLowerCase() == status.toLowerCase()
+    );
     return res.send(statusOrders);
   }
   return res.send(orders);
