@@ -2,11 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
+
 var cors = require("cors");
 
-const apiUsers = require("./routes/users");
-const vendorLogin = require("./routes/login");
+const orders = require("./routes/orders");
+const users = require("./routes/users");
 const ocrRoutes = require("./routes/ocr");
+const vendors = require("./routes/vendors");
+const apiFinance = require("./routes/finance/finance");
 
 const PORT = process.env.PORT || 3001;
 const db = require("./db/db");
@@ -27,9 +30,11 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json());
 
-app.use("/users", apiUsers);
-app.use("/vendors", vendorLogin);
 app.use("/ocr", ocrRoutes);
+app.use("/orders", orders);
+app.use("/users", users);
+app.use("/vendors", vendors);
+app.use("/finance", apiFinance);
 
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
