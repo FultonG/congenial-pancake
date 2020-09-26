@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import ApiService from './apiService';
 const Video = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -20,11 +21,23 @@ const Video = () => {
   }, [])
 
   const handleClick = (e) => {
-    const {clientHeight, clientWidth} = videoRef.current;
+    const { clientHeight, clientWidth } = videoRef.current;
     canvasRef.current.height = clientHeight;
     canvasRef.current.width = clientWidth;
-    canvasRef.current.getContext('2d').drawImage(videoRef.current, 0, 0);  
-    console.log(canvasRef.current.toDataURL());
+    canvasRef.current.getContext('2d').drawImage(videoRef.current, 0, 0);
+    const url = canvasRef.current.toDataURL()
+    var blobBin = atob(url.split(',')[1]);
+    var array = [];
+    for (var i = 0; i < blobBin.length; i++) {
+      array.push(blobBin.charCodeAt(i));
+    }
+    var file = new Blob([new Uint8Array(array)], { type: 'image/png' });
+    ApiService.sendScreenshot(file).then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.log("it fucked up", err);
+    })
   }
 
   return (
