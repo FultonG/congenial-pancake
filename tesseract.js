@@ -1,41 +1,52 @@
-const { createWorker } = require('tesseract.js');
-
-// Tesseract.recognize(
-//   'https://tesseract.projectnaptha.com/img/eng_bw.png',
-//   'eng',
-//   { logger: m => console.log(m) }
-// ).then(({ data: { text } }) => {
-//   console.log(text);
-// })
-
+const { createWorker, createScheduler} = require('tesseract.js');
 
 const worker = createWorker({
   logger: m => console.log(m), // Add logger here
 });
+const worker2 = createWorker();
+const worker3 = createWorker();
 
-// (async () => {
-//   await worker.load();
-//   await worker.loadLanguage('eng');
-//   await worker.initialize('eng');
-//   const { data: { text } } = await worker.recognize('https://tesseract.projectnaptha.com/img/eng_bw.png');
-//   console.log(text);
-//   await worker.terminate();
-// })();
+const scheduler = createScheduler();
 
 const recognizeImage = (base64url) => new Promise(async function (resolve, reject) {
     await worker.load();
+    await worker2.load();
+    await worker3.load();
     await worker.loadLanguage('eng');
+    await worker2.loadLanguage('eng');
+    
+    await worker3.loadLanguage('eng');
     await worker.initialize('eng');
-    // const { data: { text } } = await worker.recognize(base64url);
-    // console.log(text);
-    return worker.recognize(base64url).then(async (res) => {
-        // await worker.terminate();
+    await worker2.initialize('eng');
+    await worker3.initialize('eng');
+    await worker.setParameters({
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    });
+    await worker2.setParameters({
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    });
+    await worker3.setParameters({
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    });
+    //Add schedulers
+    scheduler.addWorker(worker);
+    scheduler.addWorker(worker2);
+
+    scheduler.addJob('recognize', base64url).then((res) => {
+        console.log(res.data.text);
         resolve(res.data.text);
     })
-    .catch(async (err) => {
-        // await worker.terminate();
+    .catch(err => {
         reject(err);
-    });
+    })
+    // return worker.recognize(base64url).then(async (res) => {
+    //     // await worker.terminate();
+    //     resolve(res.data.text);
+    // })
+    // .catch(async (err) => {
+    //     // await worker.terminate();
+    //     reject(err);
+    // });
 });
 
 exports.recognizeImage = recognizeImage;

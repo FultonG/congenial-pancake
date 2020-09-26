@@ -5,7 +5,7 @@ const api = axios.create({
   });
 
 const sendScreenshot = (dataUri) => {
-    api.post('/api/ocr', { image: dataUri })
+    return api.post('/api/ocr', { image: dataUri })
         .then(res => res.data);
 }
 
