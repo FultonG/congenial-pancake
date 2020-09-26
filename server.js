@@ -2,12 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
+
+var cors = require("cors");
+
 const orders = require("./routes/orders");
 const users = require("./routes/users");
-var cors = require("cors");
-const apiRoutes = require("./routes/api");
+const ocrRoutes = require("./routes/ocr");
 const vendors = require("./routes/vendors");
 const apiFinance = require("./routes/finance/finance");
+
 const PORT = process.env.PORT || 3001;
 const db = require("./db/db");
 const app = express();
@@ -26,8 +29,8 @@ app.use(cors());
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json());
-app.use("/api", apiRoutes);
 
+app.use("/ocr", ocrRoutes);
 app.use("/orders", orders);
 app.use("/users", users);
 app.use("/vendors", vendors);
@@ -40,5 +43,3 @@ app.get("*", function (req, res) {
 app.listen(PORT, function () {
   console.log(`Server running on port ${PORT}!`);
 });
-
-const license = require("./cloudmersive");

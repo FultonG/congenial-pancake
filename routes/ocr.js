@@ -1,25 +1,96 @@
 var express = require("express");
 
-var router = express.Router();
-var multer = require('multer');
+const router = express.Router();
+var multer = require("multer");
 
 var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '.png')
-    }
-})
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + ".png");
+  },
+});
 
 var upload = multer({ storage: storage });
 var cloudmersive = require("../cloudmersive");
+var Vendor = require("../models/user");
 /**
  * Receives a base64 image to read with tesseract.
  */
-router.post("/", upload.single('plate'), function (req, res) {
-    cloudmersive.readLicense(req.file.filename, res);
+router.post("/:vendorName/detect", upload.single("plate"), function (req, res) {
+    let name = req.params.vendorName;
+
+    Vendor.find({ vendorName: name }, function(err, vendors) {
+        if(err)
+            res.status(500).send(err);
+
+        cloudmersive.readLicense(req.file.filename, res).then(license => {
+            //Compare plates
+            let found = null;
+            console.log(license, vendors);
+            if(license) {
+              vendors.forEach(plate => {
+                let sim = similarity(plate.licenseTag, license) * 100;
+                console.log(sim);
+                //Passes string similarity algorithm
+                if(Math.floor(sim) >= Math.floor((5/6) * 100))
+                    found = { vendorName: name, licenseTag: plate.licenseTag }
+
+              })
+            }
+            
+            if(found)
+                res.status(200).send(found);
+            //No matching license found
+            else 
+                res.status(404).send(null);
+        
+        }).catch(err => {
+          console.log(err);
+            res.status(err.status).send(err.err);
+        })
+    })
+  
 });
 
-
 module.exports = router;
+
+
+function editDistance(s1, s2) {
+  s1 = s1.toLowerCase();
+  s2 = s2.toLowerCase();
+
+  var costs = new Array();
+  for (var i = 0; i <= s1.length; i++) {
+    var lastValue = i;
+    for (var j = 0; j <= s2.length; j++) {
+      if (i == 0) costs[j] = j;
+      else {
+        if (j > 0) {
+          var newValue = costs[j - 1];
+          if (s1.charAt(i - 1) != s2.charAt(j - 1))
+            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+          costs[j - 1] = lastValue;
+          lastValue = newValue;
+        }
+      }
+    }
+    if (i > 0) costs[s2.length] = lastValue;
+  }
+  return costs[s2.length];
+}
+
+function similarity(s1, s2) {
+    var longer = s1;
+    var shorter = s2;
+    if (s1.length < s2.length) {
+      longer = s2;
+      shorter = s1;
+    }
+    var longerLength = longer.length;
+    if (longerLength == 0) {
+      return 1.0;
+    }
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+  }
