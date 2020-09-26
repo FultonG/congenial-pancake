@@ -29,6 +29,7 @@ router.get("/get/:tag/:vendor", auth.authJWT, (req, res) => {
 router.post("/create", auth.authJWT, (req, res) => {
   const vendorName = req.body.vendorName;
   const licenseTag = req.body.licenseTag;
+  const details = req.body.details;
 
   Order.find({ vendorName, licenseTag }, (err, order) => {
     if (err) {
@@ -36,7 +37,7 @@ router.post("/create", auth.authJWT, (req, res) => {
     }
     if (!order.length) {
       Order.create(
-        { vendorName, licenseTag, completed: false },
+        { vendorName, licenseTag, details, completed: false },
         (err, create) => {
           if (err) {
             return res.status(500).send({ err });
@@ -45,7 +46,7 @@ router.post("/create", auth.authJWT, (req, res) => {
         }
       );
     } else {
-      return rres.send({ msg: "User already exists" });
+      return res.send({ msg: "User already exists" });
     }
   });
 });
