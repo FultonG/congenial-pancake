@@ -1,5 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import ApiService from './apiService';
+import ApiService from '../apiService';
+import Button from '../components/Button';
+import Card from '../components/Card';
+import { OrderContainer, VideoPlayer } from './VideoStyles';
+
 const Video = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -35,19 +39,23 @@ const Video = () => {
     ApiService.sendScreenshot(file).then(res => {
       console.log(res);
     })
-    .catch(err => {
-      console.log("it fucked up", err);
-    })
+      .catch(err => {
+        console.log("it fucked up", err);
+      })
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <video ref={videoRef} autoPlay muted></video>
+    <>
+      <OrderContainer>
+          <VideoPlayer ref={videoRef} autoPlay muted ></VideoPlayer>
+          <canvas ref={canvasRef} style={{ display: 'none', borderRadius: '10px', width: '45%', margin: '1%' }}></canvas>
+        <Card direction="column" padding="10%" width="45%" margin='1%'></Card>
+      </OrderContainer>
       <div>
-        <button onClick={handleClick}>click</button>
+        <Button onClick={handleClick}>click</Button>
       </div>
-      <canvas ref={canvasRef}></canvas>
-    </div>
+    </>
+
   )
 }
 
