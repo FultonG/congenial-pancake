@@ -1,26 +1,69 @@
 const router = require("express").Router();
 const User = require("../models/user");
-const auth = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const { response } = require("express");
+const capitalAPI = process.env.CAPITALONE_KEY;
 const saltRounds = 10;
 
 router.post("/create", async (req, res) => {
   const userData = req.body.userData;
-  const username = userData.username;
-  const password = userData.password;
+  let {
+    username,
+    password,
+    customer_id,
+    account_id,
+    balance,
+    ...customer
+  } = req.body.userData;
 
   if (!userData) {
     return res.status(400).send({ msg: "User data not passed" });
   }
 
-  const usernameDB = await User.find({ username });
-  if (usernameDB.length) {
+  const usernameTaken = await User.find({ username });
+  if (usernameTaken.length) {
     return res.status(400).send({ msg: "Username taken" });
   }
 
+  await axios
+    .post(
+      `http://api.reimaginebanking.com/customers?key=${capitalAPI}`,
+      customer
+    )
+    .then((response) => {
+      const { _id, ...customerData } = response.data.objectCreated;
+      customer = { ...customerData, customer_id: _id };
+    })
+    .catch((err) => res.status(500).send({ err }));
+
+  const account = {
+    type: "Credit Card",
+    nickname: username,
+    rewards: 0,
+    balance: 100,
+  };
+
+  await axios
+    .post(
+      `http://api.reimaginebanking.com/customers/${customer.customer_id}/accounts?key=${capitalAPI}`,
+      account
+    )
+    .then((response) => {
+      const { _id } = response.data.objectCreated;
+      account_id = _id;
+    })
+    .catch((err) => res.send(500).send({ err }));
+
   const hash = await bcrypt.hash(password, saltRounds);
-  const user = await User.create({ ...userData, password: hash });
+  const user = await User.create({
+    ...customer,
+    username,
+    password: hash,
+    account_id,
+    balance: account.balance,
+  });
 
   const token = jwt.sign({ user }, process.env.JWT_SECRET, {
     expiresIn: "24h",
