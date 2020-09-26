@@ -28,13 +28,13 @@ const recognizeImage = (base64url) => new Promise(async function (resolve, rejec
     await worker.initialize('eng');
     // const { data: { text } } = await worker.recognize(base64url);
     // console.log(text);
-    return worker.recognize(base64url).then(res => {
+    return worker.recognize(base64url).then(async (res) => {
+        // await worker.terminate();
         resolve(res.data.text);
-        worker.terminate();
     })
-    .catch(err => {
+    .catch(async (err) => {
+        // await worker.terminate();
         reject(err);
-        worker.terminate();
     });
 });
 

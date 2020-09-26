@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import ApiService from './apiService';
 const Video = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -25,6 +26,13 @@ const Video = () => {
     canvasRef.current.width = clientWidth;
     canvasRef.current.getContext('2d').drawImage(videoRef.current, 0, 0);  
     console.log(canvasRef.current.toDataURL());
+    const url = canvasRef.current.toDataURL()
+    ApiService.sendScreenshot(url).then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.log("it fucked up", err);
+    })
   }
 
   return (
