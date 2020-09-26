@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Vendor = require("../models/vendor");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const saltRounds = 10;
 
 router.post("/create", (req, res) => {
@@ -31,7 +32,10 @@ router.post("/create", (req, res) => {
         if (err) {
           return res.status(500).send({ err });
         }
-        return res.send(user);
+        const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+          expiresIn: "24h",
+        });
+        return res.send({ user, token });
       });
     });
   });
@@ -49,7 +53,10 @@ router.post("/login", (req, res) => {
       if (!hashRes) {
         return res.status(400).send({ msg: "Invalid password" });
       }
-      return res.send(user);
+      const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
+      return res.send({ user, token });
     });
   });
 });

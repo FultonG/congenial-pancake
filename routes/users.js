@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const User = require("../models/user");
+const auth = require("../middleware/auth");
 
-router.get("/get", (req, res) => {
+router.get("/get", auth.authJWT, (req, res) => {
   const completed = Boolean(req.query.completed) || null;
   const filter = completed ? { completed } : null;
 
@@ -13,7 +14,7 @@ router.get("/get", (req, res) => {
   });
 });
 
-router.get("/get/:tag/:vendor", (req, res) => {
+router.get("/get/:tag/:vendor", auth.authJWT, (req, res) => {
   const licenseTag = req.params.tag;
   const vendorName = req.params.vendor;
 
@@ -49,7 +50,7 @@ router.post("/create", (req, res) => {
   });
 });
 
-router.put("/complete/:tag/:vendor", (req, res) => {
+router.put("/complete/:tag/:vendor", auth.authJWT, (req, res) => {
   const licenseTag = req.params.tag;
   const vendorName = req.params.vendor;
 
@@ -70,7 +71,7 @@ router.put("/complete/:tag/:vendor", (req, res) => {
   );
 });
 
-router.delete("/delete", (req, res) => {
+router.delete("/delete", auth.authJWT, (req, res) => {
   const licenseTag = req.body.licenseTag;
   const vendorName = req.body.vendorName;
 
