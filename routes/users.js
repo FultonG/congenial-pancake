@@ -44,7 +44,7 @@ router.post("/create", (req, res) => {
         }
       );
     } else {
-      res.send({ msg: "User already exists" });
+      return rres.send({ msg: "User already exists" });
     }
   });
 });
@@ -58,13 +58,13 @@ router.put("/complete/:tag/:vendor", (req, res) => {
     { completed: true },
     (err, update) => {
       if (err) {
-        res.status(500).send({ err });
+        return rres.status(500).send({ err });
       }
       User.findOne({ licenseTag }, (err, user) => {
         if (err) {
-          res.status(500).send({ err });
+          return res.status(500).send({ err });
         }
-        res.send(user);
+        return res.send(user);
       });
     }
   );
