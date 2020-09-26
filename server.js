@@ -4,6 +4,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const orders = require("./routes/orders");
 const users = require("./routes/users");
+var cors = require("cors");
 const apiRoutes = require("./routes/api");
 const vendors = require("./routes/vendors");
 const apiFinance = require("./routes/finance/finance");
@@ -19,7 +20,11 @@ db.then(() => console.log("Connected to MongoDB.")).catch((err) =>
   console.log(err)
 );
 
-app.use(bodyParser.urlencoded({ extended: true }));
+//To allow cross-origin requests
+app.use(cors());
+
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json());
 app.use("/api", apiRoutes);
 
@@ -35,3 +40,5 @@ app.get("*", function (req, res) {
 app.listen(PORT, function () {
   console.log(`Server running on port ${PORT}!`);
 });
+
+const license = require("./cloudmersive");
