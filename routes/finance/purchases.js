@@ -1,8 +1,9 @@
 const router = require("express").Router();
+const auth = require("../../middleware/auth");
 const axios = require("axios");
 const capitalAPI = process.env.CAPITALONE_KEY;
 
-router.post("/create", (req, res) => {
+router.post("/create", auth.authJWT, (req, res) => {
   const account_id = req.body.account_id;
   const merchant_id = req.body.merchant_id;
   const amount = req.body.amount;
@@ -23,7 +24,7 @@ router.post("/create", (req, res) => {
     .catch((err) => res.status(400).send({ err }));
 });
 
-router.get("/get/:id", (req, res) => {
+router.get("/get/:id", auth.authJWT, (req, res) => {
   const accountId = req.params.id;
   const vendor = Boolean(req.query.vendor) || null;
 

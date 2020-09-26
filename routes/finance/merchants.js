@@ -1,8 +1,9 @@
 const router = require("express").Router();
+const auth = require("../../middleware/auth");
 const axios = require("axios");
 const capitalAPI = process.env.CAPITALONE_KEY;
 
-router.get("/get/:id", async (req, res) => {
+router.get("/get/:id", auth.authJWT, async (req, res) => {
   const id = req.params.id;
 
   axios
