@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import ApiService from '../apiService';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import { PageContainer, OrderContainer, Column } from './VideoStyles';
+import { OrderContainer, VideoPlayer } from './VideoStyles';
 
 const Video = () => {
   const videoRef = useRef(null);
@@ -45,18 +45,17 @@ const Video = () => {
   }
 
   return (
-    <PageContainer>
+    <>
       <OrderContainer>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-          <video ref={videoRef} autoPlay muted style={{ borderRadius: '10px', width: '90%', height: '90%' }}></video>
-          <div>
-            <Button onClick={handleClick}>click</Button>
-          </div>
-          <canvas ref={canvasRef} style={{ display: 'none', borderRadius: '10px', width: '90%', height: '90%' }}></canvas>
-        </div>
-        <Card height="80%" direction="column" padding="10%" width="80%"></Card>
+          <VideoPlayer ref={videoRef} autoPlay muted ></VideoPlayer>
+          <canvas ref={canvasRef} style={{ display: 'none', borderRadius: '10px', width: '45%', margin: '1%' }}></canvas>
+        <Card direction="column" padding="10%" width="45%" margin='1%'></Card>
       </OrderContainer>
-    </PageContainer>
+      <div>
+        <Button onClick={handleClick}>click</Button>
+      </div>
+    </>
+
   )
 }
 

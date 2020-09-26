@@ -1,18 +1,14 @@
 import styled from 'styled-components';
 
-export const PageContainer = styled.div`
-width: 100%;
-display: flex;
-justify-content: center;
-`;
-
-
 export const OrderContainer = styled.div`
- justify-content: center;
- align-items: center;
- font-size: 16px;
-display: flex;
-width: 60%;
-margin-top: 5%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 16px;
 `;
 
+export const VideoPlayer = styled.video`
+  border-radius: 10px;
+  width: 45%;
+  margin: 1%;
+`;
