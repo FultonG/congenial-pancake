@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const User = require("../models/user");
+const auth = require("../middleware/auth");
 
-router.get("/get", (req, res) => {
+router.get("/get", auth.authJWT, (req, res) => {
   const completed = Boolean(req.query.completed) || null;
   const filter = completed ? { completed } : null;
 
@@ -13,7 +14,7 @@ router.get("/get", (req, res) => {
   });
 });
 
-router.get("/get/:tag/:vendor", (req, res) => {
+router.get("/get/:tag/:vendor", auth.authJWT, (req, res) => {
   const licenseTag = req.params.tag;
   const vendorName = req.params.vendor;
 
@@ -44,12 +45,12 @@ router.post("/create", (req, res) => {
         }
       );
     } else {
-      res.send({ msg: "User already exists" });
+      return rres.send({ msg: "User already exists" });
     }
   });
 });
 
-router.put("/complete/:tag/:vendor", (req, res) => {
+router.put("/complete/:tag/:vendor", auth.authJWT, (req, res) => {
   const licenseTag = req.params.tag;
   const vendorName = req.params.vendor;
 
@@ -58,19 +59,19 @@ router.put("/complete/:tag/:vendor", (req, res) => {
     { completed: true },
     (err, update) => {
       if (err) {
-        res.status(500).send({ err });
+        return rres.status(500).send({ err });
       }
       User.findOne({ licenseTag }, (err, user) => {
         if (err) {
-          res.status(500).send({ err });
+          return res.status(500).send({ err });
         }
-        res.send(user);
+        return res.send(user);
       });
     }
   );
 });
 
-router.delete("/delete", (req, res) => {
+router.delete("/delete", auth.authJWT, (req, res) => {
   const licenseTag = req.body.licenseTag;
   const vendorName = req.body.vendorName;
 
