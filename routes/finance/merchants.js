@@ -4,9 +4,7 @@ const axios = require("axios");
 const capitalAPI = process.env.CAPITALONE_KEY;
 
 router.post("/create", async (req, res) => {
-  let user = req.body.merchant;
-  const username = user.username;
-  const payload = user.merchantData;
+  let { user, username, password, ...payload } = req.body.merchant;
 
   if (payload._id) {
     return res
@@ -21,11 +19,14 @@ router.post("/create", async (req, res) => {
       payload
     )
     .then((response) => {
-      merchantData = response.data.objectCreated;
+      const { _id, ...data } = response.data.objectCreated;
+      merchantData = { ...data, merchant_id: _id };
     })
     .catch((err) => res.status(500).send({ err }));
 
-  await Vendor.updateOne({ username }, { merchantData });
+  console.log(merchantData);
+
+  await Vendor.updateOne({ username }, merchantData);
   user = await Vendor.findOne({ username });
 
   res.send(user);
