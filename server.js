@@ -5,8 +5,9 @@ const bodyParser = require("body-parser");
 var cors = require("cors");
 
 const apiUsers = require("./routes/users");
-const apiRoutes = require("./routes/api");
 const vendorLogin = require("./routes/login");
+const ocrRoutes = require("./routes/ocr");
+
 const PORT = process.env.PORT || 3001;
 const db = require("./db/db");
 const app = express();
@@ -25,10 +26,10 @@ app.use(cors());
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json());
-app.use("/api", apiRoutes);
 
 app.use("/users", apiUsers);
 app.use("/vendors", vendorLogin);
+app.use("/ocr", ocrRoutes);
 
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
@@ -37,5 +38,3 @@ app.get("*", function (req, res) {
 app.listen(PORT, function () {
   console.log(`Server running on port ${PORT}!`);
 });
-
-const license = require("./cloudmersive");
