@@ -1,12 +1,25 @@
 const router = require("express").Router();
 const User = require("../models/user");
 
-router.get("/get/:tag", (req, res) => {
-  const tag = req.params.tag;
+router.get("/get", (req, res) => {
+  const completed = Boolean(req.query.completed) || null;
+  const filter = completed ? { completed } : null;
 
-  User.findOne({ licenseTag: tag }, (err, user) => {
+  User.find(filter, (err, users) => {
     if (err) {
-      return res.send({ err });
+      return res.status(500).send({ err });
+    }
+    return res.send(users);
+  });
+});
+
+router.get("/get/:tag/:vendor", (req, res) => {
+  const licenseTag = req.params.tag;
+  const vendorName = req.params.vendor;
+
+  User.findOne({ vendorName, licenseTag }, (err, user) => {
+    if (err) {
+      return res.status(500).send({ err });
     }
     return res.send(user);
   });
@@ -18,14 +31,14 @@ router.post("/create", (req, res) => {
 
   User.find({ vendorName, licenseTag }, (err, user) => {
     if (err) {
-      return res.send({ err });
+      return res.status(500).send({ err });
     }
     if (!user.length) {
       User.create(
         { vendorName, licenseTag, completed: false },
         (err, create) => {
           if (err) {
-            return res.send({ err });
+            return res.status(500).send({ err });
           }
           return res.send(create);
         }
@@ -45,16 +58,28 @@ router.put("/complete/:tag/:vendor", (req, res) => {
     { completed: true },
     (err, update) => {
       if (err) {
-        res.send({ err });
+        res.status(500).send({ err });
       }
       User.findOne({ licenseTag }, (err, user) => {
         if (err) {
-          res.send({ err });
+          res.status(500).send({ err });
         }
         res.send(user);
       });
     }
   );
+});
+
+router.delete("/delete", (req, res) => {
+  const licenseTag = req.body.licenseTag;
+  const vendorName = req.body.vendorName;
+
+  User.deleteOne({ vendorName, licenseTag }, (err) => {
+    if (err) {
+      return res.status(500).send({ err });
+    }
+    return res.send({ msg: "User deleted" });
+  });
 });
 
 module.exports = router;
