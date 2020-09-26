@@ -3,6 +3,7 @@ const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const apiUsers = require("./routes/users");
+const apiRoutes = require("./routes/api");
 const PORT = process.env.PORT || 3001;
 const db = require("./db/db");
 const app = express();
@@ -17,6 +18,7 @@ db.then(() => console.log("Connected to MongoDB.")).catch((err) =>
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use("/api", apiRoutes);
 
 app.use("/users", apiUsers);
 
