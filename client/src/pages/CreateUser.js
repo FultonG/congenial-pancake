@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import { FormContainer, Form, Input, ButtonContainer } from '../components/Form';
 import Button from '../components/Button';
 import API from '../apiService';
+import Modal from 'react-modal';
 
 const initialUserData = {
   username: "",
@@ -20,6 +21,8 @@ const initialUserData = {
 const CreateUser = () => {
 
   const [userData, setUserData] = useState(initialUserData);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [error, setError] = useState('');
 
   const updatePayload = (attr, value, isAddress = false) => {
     if(isAddress){
@@ -35,8 +38,13 @@ const CreateUser = () => {
       let res = await API.createUser(userData);
       console.log(res);
     } catch(e) {
-      console.log(e.message);
+      setError(e.message);
+      toggleModal();
     }
+  }
+
+  const toggleModal = () => {
+    setModalIsOpen(prev => !prev);
   }
 
   return (
@@ -55,6 +63,14 @@ const CreateUser = () => {
         <ButtonContainer>
           <Button type="submit">Create</Button>
         </ButtonContainer>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={toggleModal}
+          contentLabel="Error"
+        >
+          <button onClick={toggleModal}>close</button>
+          ({error & <div>{error}</div>})
+        </Modal>
       </Form>
     </FormContainer>
   )
