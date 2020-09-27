@@ -16,11 +16,11 @@ const sendScreenshot = (file) => {
 }
 
 const createUser = (userData) => {
-    return api.post('/users/create', {userData}).then(res => res.data)
+    return api.post('/users/create', { userData }).then(res => res.data)
 }
 
 const createVendor = (vendorData) => {
-    return api.post('/vendors/create', {vendorData}).then(res => res.data)
+    return api.post('/vendors/create', { vendorData }).then(res => res.data)
 }
 
 const loginUser = (userData) => {
@@ -33,7 +33,12 @@ const getAllVendors = () => {
 
 const checkout = (checkoutData) => {
     let user = JSON.parse(localStorage.getItem('user'));
-    return api.post('/finance/purchase/create', {checkoutData: {...checkoutData, account_id: user.account_id}}).then(res => res.data)
+    let jwt = localStorage.getItem('userJWT');
+    return api.post('/finance/purchase/create', { ...checkoutData, account_id: user.account_id }, {
+        headers: {
+            authorization: jwt
+        }
+    }).then(res => res.data)
 }
 
 export default {

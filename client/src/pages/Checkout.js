@@ -138,7 +138,7 @@ function getTax(amt) {
 function getTotal(list) {
     const subtotal = parseFloat(getSubtotal(list));
     const tax = parseFloat(getTax(subtotal));
-    return (subtotal + tax).toFixed(2);
+    return parseFloat((subtotal + tax).toFixed(2));
 
 }
 const Checkout = ({ }) => {
