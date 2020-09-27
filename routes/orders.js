@@ -34,7 +34,6 @@ router.post("/create", auth.authJWT, async (req, res) => {
   const licenseTag = req.body.licenseTag;
   const ordered = req.body.order;
 
-  console.log(ordered);
   const { _id } = await Order.create({
     vendorName,
     licenseTag,
