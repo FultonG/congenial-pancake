@@ -31,10 +31,15 @@ const getAllVendors = () => {
     return api.get('/vendors/all').then(res => res.data)
 }
 
+const checkout = (checkoutData) => {
+    return api.post('/finance/create', checkoutData).then(res => res.data)
+}
+
 export default {
     sendScreenshot,
     createUser,
     createVendor,
     loginUser,
-    getAllVendors
+    getAllVendors,
+    checkout
 }
