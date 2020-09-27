@@ -11,6 +11,7 @@ import RegisterVendor from './pages/CreateVendor';
 import LoginPage from "./pages/LoginPage"
 import Restaurants from "./pages/Restaurants";
 import Checkout from "./pages/Checkout";
+import OrderStatus from "./pages/OrderStatus";
 
 
 const AppRouter = () =>
@@ -35,6 +36,9 @@ const AppRouter = () =>
           </PrivateRoute>
           <PrivateRoute path="/checkout">
             <Checkout />
+          </PrivateRoute>
+          <PrivateRoute path="/status">
+            <OrderStatus />
           </PrivateRoute>
           <VendorRoute path="/vendor">
             <Video />
