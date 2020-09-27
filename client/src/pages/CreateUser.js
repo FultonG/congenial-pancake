@@ -36,7 +36,8 @@ const CreateUser = () => {
     try {
       e.preventDefault();
       let res = await API.createUser(userData);
-      console.log(res);
+      localStorage.setItem("userJWT", res.token);
+      localStorage.setItem("isVendor", false)
     } catch(e) {
       setError(e.message);
       toggleModal();
@@ -70,7 +71,7 @@ const CreateUser = () => {
           contentLabel="Error"
         >
           <button onClick={toggleModal}>close</button>
-          ({error & <div>{error}</div>})
+          ({error && <div>{error}</div>})
         </Modal>
       </Form>
     </FormContainer>

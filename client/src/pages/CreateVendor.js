@@ -39,7 +39,7 @@ const CreateUser = () => {
   return (
     <FormContainer>
       <Form onSubmit={submitUser}>
-        <h1>Create a User</h1>
+        <h1>Create a Vendor</h1>
         <Input placeholder="Vendor Name" value={vendorData.vendorname} onChange={(e) => updatePayload('vendorName', e.currentTarget.value)}></Input>
         <Input placeholder="Password" type="password" value={vendorData.password} onChange={(e) => updatePayload('password', e.currentTarget.value)}></Input>
         <Input placeholder="User Name" value={vendorData.username} onChange={(e) => updatePayload('username', e.currentTarget.value)}></Input>

@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Video from "./pages/Video";
 import RegisterPage from "./pages/CreateUser"
+import RegisterVendor from './pages/CreateVendor';
 import LoginPage from "./pages/LoginPage"
 import Restaurants from "./pages/Restaurants";
 
@@ -24,6 +25,9 @@ const AppRouter = () =>
           </Route>
           <Route path="/register">
             <RegisterPage />
+          </Route>
+          <Route path="/register-vendor">
+            <RegisterVendor />
           </Route>
           <PrivateRoute path="/restaurants">
             <Restaurants />
