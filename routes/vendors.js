@@ -2,12 +2,18 @@ const router = require("express").Router();
 const Vendor = require("../models/vendor");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const capitalAPI = process.env.CAPITALONE_KEY;
 const saltRounds = 10;
 
 router.post("/create", async (req, res) => {
-  const username = req.body.username;
-  const vendorName = req.body.vendorName;
-  const password = req.body.password;
+  const {
+    username,
+    vendorName,
+    password,
+    merchant_id,
+    ...merchant
+  } = req.body.vendorData;
 
   if (!username || username.trim().length < 6) {
     return res
@@ -36,7 +42,24 @@ router.post("/create", async (req, res) => {
     return res.status(400).send({ msg });
   }
 
-  const user = await Vendor.create({ username, vendorName, password: hash });
+  let merchantData = null;
+  await axios
+    .post(
+      `http://api.reimaginebanking.com/merchants?key=${capitalAPI}`,
+      merchant
+    )
+    .then((response) => {
+      const { _id, ...data } = response.data.objectCreated;
+      merchantData = { ...data, merchant_id: _id };
+    })
+    .catch((err) => res.status(400).send({ err }));
+
+  const user = await Vendor.create({
+    username,
+    vendorName,
+    password: hash,
+    ...merchantData,
+  });
   const token = jwt.sign({ username, vendorName }, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });
