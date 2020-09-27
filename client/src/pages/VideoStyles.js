@@ -12,3 +12,4 @@ export const VideoPlayer = styled.video`
   width: 45%;
   margin: 1%;
 `;
+
