@@ -5,8 +5,9 @@ const vendor = require("../models/vendor");
 
 router.get("/all", auth.authJWT, async (req, res) => {
   const status = req.query.status || null;
+  const vendor = req.query.vendor || null;
 
-  const orders = await Order.find({}).select({
+  const orders = await Order.find({ vendor }).select({
     __v: 0,
   });
   if (status) {
