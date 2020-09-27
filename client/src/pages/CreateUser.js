@@ -23,6 +23,7 @@ const CreateUser = () => {
   const [userData, setUserData] = useState(initialUserData);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [error, setError] = useState('');
+  const [text, setText] = useState('');
 
   const updatePayload = (attr, value, isAddress = false) => {
     if(isAddress){
@@ -37,8 +38,11 @@ const CreateUser = () => {
       e.preventDefault();
       let res = await API.createUser(userData);
       localStorage.setItem("userJWT", res.token);
-      localStorage.setItem("isVendor", false)
+      localStorage.setItem("isVendor", false);
+      setText('Successfully Created an Account!');
+      toggleModal();
     } catch(e) {
+      setText('');
       setError(e.message);
       toggleModal();
     }
@@ -46,6 +50,22 @@ const CreateUser = () => {
 
   const toggleModal = () => {
     setModalIsOpen(prev => !prev);
+  }
+
+  const customStyles = {
+   
+    content: {
+      display: 'flex',
+      flexdirection: 'Column',
+      position: 'absolute',
+      left: '50%',
+      top: '50%',      
+      transform: 'translate(-50%, -50%)',
+      outline: 'none',
+      font: 'Montserratt',
+      justifyContent: 'space-between',
+      padding: '5%',
+    }
   }
 
   return (
@@ -65,13 +85,18 @@ const CreateUser = () => {
           <a style={{alignSelf: 'center', margin: '32px 16px'}} href="/login">Already have an account? Click here.</a>
           <Button type="submit">Create</Button>
         </ButtonContainer>
+
         <Modal
+          style = {customStyles}
           isOpen={modalIsOpen}
           onRequestClose={toggleModal}
           contentLabel="Error"
-        >
-          <button onClick={toggleModal}>close</button>
-          ({error && <div>{error}</div>})
+        > 
+         
+          {text}
+          {error? <div>{error}</div>:null}
+          <div direction="row"><Button onClick={toggleModal} style={{justifyContent : 'center', margin : '0px'}}>close</Button>
+          </div>
         </Modal>
       </Form>
     </FormContainer>
