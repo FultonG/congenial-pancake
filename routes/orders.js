@@ -6,7 +6,10 @@ const vendor = require("../models/vendor");
 router.get("/all", auth.authJWT, async (req, res) => {
   const status = req.query.status || null;
 
-  const orders = await Order.find({});
+  const orders = await Order.find({}).select({
+    _id: 0,
+    __v: 0,
+  });
   if (status) {
     const statusOrders = orders.filter(
       (order) => order.status.toLowerCase() == status.toLowerCase()
@@ -20,7 +23,10 @@ router.get("/get/:tag/:vendor", auth.authJWT, async (req, res) => {
   const licenseTag = req.params.tag;
   const vendorName = req.params.vendor;
 
-  const order = await Order.findOne({ vendorName, licenseTag });
+  const order = await Order.findOne({ vendorName, licenseTag }).select({
+    _id: 0,
+    __v: 0,
+  });
   return res.send(order);
 });
 
@@ -28,12 +34,19 @@ router.post("/create", auth.authJWT, async (req, res) => {
   const vendorName = req.body.vendorName;
   const licenseTag = req.body.licenseTag;
 
-  const orders = await Order.find({ vendorName, licenseTag });
+  const orders = await Order.find({ vendorName, licenseTag }).select({
+    _id: 0,
+    __v: 0,
+  });
   if (!orders.length) {
-    const order = await Order.create({
+    await Order.create({
       vendorName,
       licenseTag,
       status: "ordered",
+    });
+    const order = await Order.findOne({ vendorName, licenseTag }).select({
+      _id: 0,
+      __v: 0,
     });
     res.send(order);
   } else {
@@ -46,10 +59,11 @@ router.put("/status", auth.authJWT, async (req, res) => {
   const vendorName = req.body.vendorName;
   const status = req.body.status;
 
-  console.log(licenseTag);
-  console.log(vendorName);
   await Order.updateOne({ licenseTag, vendorName }, { status });
-  const order = await Order.findOne({ licenseTag, vendorName });
+  const order = await Order.findOne({ licenseTag, vendorName }).select({
+    _id: 0,
+    __v: 0,
+  });
 
   res.send(order);
 });
