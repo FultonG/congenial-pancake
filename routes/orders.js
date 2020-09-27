@@ -32,14 +32,16 @@ router.post("/create", auth.authJWT, async (req, res) => {
   const vendorName = req.body.vendorName;
   const licenseTag = req.body.licenseTag;
   const ordered = req.body.order;
+
   console.log(ordered);
-  await Order.create({
+  const { _id } = await Order.create({
     vendorName,
     licenseTag,
     status: "ordered",
     order: ordered,
+    created: Date.now(),
   });
-  const order = await Order.findOne({ vendorName, licenseTag }).select({
+  const order = await Order.findOne({ _id }).select({
     __v: 0,
   });
   res.send(order);
