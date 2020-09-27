@@ -28,7 +28,9 @@ const LoginPage = () => {
       e.preventDefault();
       let res = await API.loginUser(userData);
       if(res) {
+        console.log(res);
         localStorage.setItem("userJWT", res.token);
+        localStorage.setItem("user", JSON.stringify(res.user))
         localStorage.setItem("isVendor", true)
         if(res.vendorName) {
           history.push("/vendor");
