@@ -50,7 +50,8 @@ const CreateUser = () => {
         <Input placeholder="Street Number" value={userData.address.street_number} onChange={(e) => updatePayload('street_number', e.currentTarget.value, true)}></Input>
         <Input placeholder="Street Name" value={userData.address.street_name} onChange={(e) => updatePayload('street_name', e.currentTarget.value, true)}></Input>
         <Input placeholder="City" value={userData.address.city} onChange={(e) => updatePayload('city', e.currentTarget.value, true)}></Input>
-        <Input placeholder="State" value={userData.address.zip} onChange={(e) => updatePayload('zip', e.currentTarget.value, true)}></Input>
+        <Input placeholder="State" value={userData.address.state} onChange={(e) => updatePayload('state', e.currentTarget.value, true)}></Input>
+        <Input placeholder="Zip" value={userData.address.zip} onChange={(e) => updatePayload('zip', e.currentTarget.value, true)}></Input>
         <ButtonContainer>
           <Button type="submit">Create</Button>
         </ButtonContainer>
