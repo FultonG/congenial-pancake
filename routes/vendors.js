@@ -118,8 +118,14 @@ router.put("/menu/edit", async (req, res) => {
   let vendor = await Vendor.findOne({ vendorName });
 
   if (removeItems) {
-    await Vendor.updateOne({ vendorName }, { menu: { $unset: removeItems } });
-    console.log(removeItems);
+    const menu = vendor.menu;
+    for (const item in menu) {
+      if (removeItems[item]) {
+        delete menu[item];
+      }
+    }
+
+    await Vendor.updateOne({ vendorName }, { menu });
   }
 
   if (addItems) {
