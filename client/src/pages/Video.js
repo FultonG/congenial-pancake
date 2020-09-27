@@ -2,7 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import ApiService from '../apiService';
 import Button from '../components/Button';
 import Card from '../components/Card';
-import { OrderContainer, VideoPlayer } from './VideoStyles';
+import { OrderContainer, VideoPlayer, PageTitle } from './VideoStyles';
+import { GrGroup, GrMenu } from 'react-icons/gr';
+import { Form } from '../components/Form';
 
 const Video = () => {
   const videoRef = useRef(null);
@@ -47,9 +49,14 @@ const Video = () => {
   return (
     <>
       <OrderContainer>
-          <VideoPlayer ref={videoRef} autoPlay muted ></VideoPlayer>
-          <canvas ref={canvasRef} style={{ display: 'none', borderRadius: '10px', width: '45%', margin: '1%' }}></canvas>
-        <Card direction="column" padding="10%" width="45%" margin='1%'></Card>
+        <VideoPlayer ref={videoRef} autoPlay muted ></VideoPlayer>
+        <canvas ref={canvasRef} style={{ display: 'none', borderRadius: '10px', width: '45%', margin: '1%' }}></canvas>
+        <Card direction="column" padding="10%" width="45%" margin='1%'><h1 style={{ fontFamily: 'Montserrat', fontWeight: '300' }}>Order Details</h1>
+          <div direction="row"><GrMenu></GrMenu><GrGroup></GrGroup></div>
+        <Form>JOHN DOE</Form>
+        <Form>1x Hamburger :)</Form>
+        <Form>1x 999 Chicken Mcnuggets</Form>
+        </Card>
       </OrderContainer>
       <div>
         <Button onClick={handleClick}>click</Button>
