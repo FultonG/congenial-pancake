@@ -149,7 +149,6 @@ const Checkout = ({ }) => {
   let location = useLocation();
   let history = useHistory();
   useEffect(() => {
-    console.log(location);
 
     
     //Set new list of items for order receipt
@@ -164,20 +163,16 @@ const Checkout = ({ }) => {
 
     setList(newList);
     
-    checkoutData.total = getTotal(newList);
+    checkoutData.amount = getTotal(newList);
     // Set merchant/account id info here
-    // checkoutData.merchant_id
+    checkoutData.merchant_id = location.state.vendorID
   }, []);
 
   const submitCheckout = async (e) => {
     try {
       e.preventDefault();
-    //   let res = await API.checkout(checkoutData);
-    //     console.log(res);
-      setTimeout(() => {
-        //Temporary
-        history.push("/restaurants");
-      }, 1500)
+      let res = await API.checkout(checkoutData);
+      console.log(res);
     } catch (e) {
       setError(e.message);
       toggleModal();

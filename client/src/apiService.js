@@ -32,7 +32,8 @@ const getAllVendors = () => {
 }
 
 const checkout = (checkoutData) => {
-    return api.post('/finance/create', checkoutData).then(res => res.data)
+    let user = JSON.parse(localStorage.getItem('user'));
+    return api.post('/finance/purchase/create', {checkoutData: {...checkoutData, account_id: user.account_id}}).then(res => res.data)
 }
 
 export default {

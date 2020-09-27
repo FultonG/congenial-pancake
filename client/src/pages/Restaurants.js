@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Card from "../components/Card";
+import Button from "../components/Button";
 import API from '../apiService';
 
 import { FaShoppingCart } from "react-icons/fa";
@@ -68,7 +68,7 @@ const ListItem = styled.li(({hoverScale=true, selected, cursor='normal'}) => `
 `
 );
 
-const TemplatePicture = styled.div`
+const TemplatePicture = styled.img`
     width: 40px;
     height: 40px;
     background-color: #cecece;
@@ -142,13 +142,10 @@ const Restaurants = () => {
                     <Header>Restaurants</Header>
                     {vendors.map((rest, index) => {
                         return (
-                            <ListItem key={index} onClick={() => setSelected(vendors[index])} selected={rest.name === selected.name}>
-                                <h3 style={{fontWeight: 600, margin: 0, marginBottom: 10}}>{rest.name}</h3>
+                            <ListItem key={index} onClick={() => setSelected(vendors[index])} selected={rest.vendorName === selected.vendorName}>
+                                <h3 style={{fontWeight: 600, margin: 0, marginBottom: 10}}>{rest.vendorName}</h3>
                                 <div style={{display: 'flex', alignItems: 'flex-start', width: "50%"}}>
-                                    <TemplatePicture style={{marginLeft: 0}}/>
-                                    <TemplatePicture />
-                                    <TemplatePicture />
-                                    <TemplatePicture />
+                                    {rest.menu_gallery?.map(img => <TemplatePicture src={img}/>)}
                                 </div>
                                 <div>{rest.address}</div>
                                 
@@ -160,7 +157,7 @@ const Restaurants = () => {
 
             {selected &&
             <DetailContainer style={{float: 'right'}}>
-                <Header>{selected.name}</Header>
+                <Header>{selected.vendorName}</Header>
                 <div>
                     <TemplateMap />
                     <div>{selected.address}</div>
@@ -169,7 +166,7 @@ const Restaurants = () => {
                 <Header fontSize={14}></Header>
                 <hr />
                 <h3>Menu</h3>
-                <Menu items={selected.menu}/>
+                <Menu items={selected.menu} vendorID={selected.merchant_id}/>
 
             </DetailContainer>
             }
@@ -270,7 +267,7 @@ const MenuContainer = styled.div`
 }
 `;
 
-const Menu = ({ items }) => {
+const Menu = ({ items, vendorID }) => {
     let history = useHistory();
 
     const [cart, setCart] = useState({});
@@ -285,7 +282,7 @@ const Menu = ({ items }) => {
         setCart(cartItems);
 
     }
-    useEffect(() => initCart(), []);
+
     useEffect(() => initCart(), [items])
 
     function updateQuantity(e, key, direction) {
@@ -328,7 +325,7 @@ const Menu = ({ items }) => {
     }
 
     function goToCheckout() {
-        history.push('/checkout', { cart: cart, menu: items} );
+        history.push('/checkout', { cart: cart, menu: items, vendorID} );
     }
 
     return (
@@ -386,11 +383,9 @@ const CartButton = styled.div`
 
 const CartCheckout = ({ itemsInCart, onCheckout }) => (
     <CartButton onClick={(e) => onCheckout(e)}>
-        <CartCard showCard={itemsInCart}>
-            <InnerCard>
+            <Button>
                 Checkout <FaShoppingCart style={{margin: '0px 5px'}}/>
-            </InnerCard>
-        </CartCard>
+            </Button>
     </CartButton>
     
 )
