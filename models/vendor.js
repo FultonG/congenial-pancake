@@ -7,6 +7,7 @@ const VendorSchema = mongoose.Schema({
   merchant_id: { type: String, required: false },
   name: { type: String, required: true },
   category: { type: String, required: true },
+  creation_date: { type: String, required: false },
   address: {
     street_number: { type: String, required: true },
     street_name: { type: String, required: true },
