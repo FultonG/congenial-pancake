@@ -1,7 +1,8 @@
 import React from 'react';
-import CreateVendor from './pages/CreateVendor';
+import AppRouter from './AppRouter';
+
 const App = () => (
- <CreateVendor/>
+    <AppRouter />
 )
 
 export default App;
