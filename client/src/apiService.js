@@ -34,7 +34,7 @@ const getAllVendors = () => {
 const checkout = (checkoutData) => {
     let user = JSON.parse(localStorage.getItem('user'));
     let jwt = localStorage.getItem('userJWT');
-    return api.post('/finance/purchase/create', { ...checkoutData, account_id: user.account_id, licenseTag: user.licenseTag }, {
+    return api.post('/finance/purchase/create', { ...checkoutData, account_id: user.account_id, licenseTag: user.license_tag }, {
         headers: {
             authorization: jwt
         }
