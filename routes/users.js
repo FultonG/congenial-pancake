@@ -54,7 +54,7 @@ router.post("/create", async (req, res) => {
       const { _id } = response.data.objectCreated;
       account_id = _id;
     })
-    .catch((err) => res.send(500).send({ err }));
+    .catch((err) => res.status(400).send({ err }));
 
   const hash = await bcrypt.hash(password, saltRounds);
   const user = await User.create({
