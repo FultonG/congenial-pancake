@@ -1,86 +1,71 @@
 const router = require("express").Router();
 const Order = require("../models/order");
 const auth = require("../middleware/auth");
+const vendor = require("../models/vendor");
 
-router.get("/get", auth.authJWT, (req, res) => {
-  const completed = Boolean(req.query.completed) || null;
-  const filter = completed ? { completed } : null;
+router.get("/all", auth.authJWT, async (req, res) => {
+  const status = req.query.status || null;
 
-  Order.find(filter, (err, orders) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    return res.send(orders);
+  const orders = await Order.find({}).select({
+    __v: 0,
   });
+  if (status) {
+    const statusOrders = orders.filter(
+      (order) => order.status.toLowerCase() == status.toLowerCase()
+    );
+    return res.send(statusOrders);
+  }
+  return res.send(orders);
 });
 
-router.get("/get/:tag/:vendor", auth.authJWT, (req, res) => {
+router.get("/get/:tag/:vendor", auth.authJWT, async (req, res) => {
   const licenseTag = req.params.tag;
   const vendorName = req.params.vendor;
 
-  Order.findOne({ vendorName, licenseTag }, (err, order) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    return res.send(order);
+  const order = await Order.findOne({ vendorName, licenseTag }).select({
+    __v: 0,
   });
+  return res.send(order);
 });
 
-router.post("/create", auth.authJWT, (req, res) => {
+router.post("/create", auth.authJWT, async (req, res) => {
   const vendorName = req.body.vendorName;
   const licenseTag = req.body.licenseTag;
+  const ordered = req.body.order;
 
-  Order.find({ vendorName, licenseTag }, (err, order) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    if (!order.length) {
-      Order.create(
-        { vendorName, licenseTag, completed: false },
-        (err, create) => {
-          if (err) {
-            return res.status(500).send({ err });
-          }
-          return res.send(create);
-        }
-      );
-    } else {
-      return rres.send({ msg: "User already exists" });
-    }
+  console.log(ordered);
+  const { _id } = await Order.create({
+    vendorName,
+    licenseTag,
+    status: "ordered",
+    order: ordered,
+    created: Date.now(),
   });
+  const order = await Order.findOne({ _id }).select({
+    __v: 0,
+  });
+  res.send(order);
 });
 
-router.put("/complete/:tag/:vendor", auth.authJWT, (req, res) => {
-  const licenseTag = req.params.tag;
-  const vendorName = req.params.vendor;
+router.put("/status", auth.authJWT, async (req, res) => {
+  const licenseTag = req.body.licenseTag;
+  const vendorName = req.body.vendorName;
+  const status = req.body.status;
 
-  Order.updateOne(
-    { vendorName, licenseTag },
-    { completed: true },
-    (err, update) => {
-      if (err) {
-        return rres.status(500).send({ err });
-      }
-      Order.findOne({ licenseTag }, (err, order) => {
-        if (err) {
-          return res.status(500).send({ err });
-        }
-        return res.send(order);
-      });
-    }
-  );
+  await Order.updateOne({ licenseTag, vendorName }, { status });
+  const order = await Order.findOne({ licenseTag, vendorName }).select({
+    __v: 0,
+  });
+
+  res.send(order);
 });
 
-router.delete("/delete", auth.authJWT, (req, res) => {
+router.delete("/delete", auth.authJWT, async (req, res) => {
   const licenseTag = req.body.licenseTag;
   const vendorName = req.body.vendorName;
 
-  Order.deleteOne({ vendorName, licenseTag }, (err) => {
-    if (err) {
-      return res.status(500).send({ err });
-    }
-    return res.send({ msg: "User deleted" });
-  });
+  await Order.deleteOne({ vendorName, licenseTag });
+  return res.send({ msg: "Order deleted" });
 });
 
 module.exports = router;
