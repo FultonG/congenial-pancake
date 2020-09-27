@@ -4,10 +4,15 @@ const api = axios.create({
     baseURL: 'http://localhost:3001',
 });
 
-const sendScreenshot = (file) => {
+const protectedApi = axios.create({
+    baseURL: 'http://localhost:3001',
+    headers: {'Authorization': localStorage.getItem("userJWT")}
+})
+
+const sendScreenshot = (file, vendorName) => {
     let formData = new FormData();
     formData.append('plate', file);
-    return api.post('/api/ocr', formData, {
+    return api.post(`/ocr/${vendorName}/detect`, formData, {
         headers: {
             'content-type': 'multipart/form-data'
         }
@@ -27,6 +32,10 @@ const loginUser = (userData) => {
     return api.post('/users/login', userData).then(res => res.data)
 }
 
+const loginVendor = (userData) => {
+    return api.post('/vendors/login', userData).then(res => res.data)
+}
+
 const getAllVendors = () => {
     return api.get('/vendors/all').then(res => res.data)
 }
@@ -41,11 +50,18 @@ const checkout = (checkoutData) => {
     }).then(res => res.data)
 }
 
+const getOrders = (vendorName) => {
+    return protectedApi.get(`/orders/all?${vendorName ? 'vendor=' + vendorName : ''}`).then(res => res.data)
+}
+
+
 export default {
     sendScreenshot,
     createUser,
     createVendor,
     loginUser,
+    loginVendor,
     getAllVendors,
-    checkout
+    checkout,
+    getOrders
 }
