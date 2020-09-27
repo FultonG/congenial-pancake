@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Card from "../components/Card";
+import API from '../apiService';
 
 import { FaShoppingCart } from "react-icons/fa";
 
@@ -119,116 +120,28 @@ const TemplateMap = styled.div`
     margin: 25px 0px;
 `;
 
-const restaurants = [
-    {
-        "name": "Restaurant",
-        "address": "123 SW 54 Street, Orlando, FL 4562",
-        "menu": {
-            "McD": {
-                "description": "The best McDee you'll get in town",
-                "amount": 10.88
-            },
-            "McDribble": {
-                "description": "The best McDribble you'll get in town",
-                "amount": 11.00
-            },
-            "McDubble": {
-                "description": "The best McDee you'll get in town",
-                "amount": 10.88
-            },
-            "McDickies": {
-                "description": "The best McDribble you'll get in town",
-                "amount": 11.00
-            }
-        }
-    },
-    {
-        "name": "Restaurant 2",
-        "address": "123 SW 54 Street, Orlando, FL 4562",
-        "menu": {
-            "McD": {
-                "description": "The best McDee you'll get in town",
-                "amount": 10.88
-            },
-            "McDribble": {
-                "description": "The best McDribble you'll get in town",
-                "amount": 11.00
-            }
-        }
-    },
-    {
-        "name": "Restaurant 3",
-        "address": "123 SW 54 Street, Orlando, FL 4562",
-        "menu": {
-            "McD": {
-                "description": "The best McDee you'll get in town",
-                "amount": 10.88
-            },
-            "McDribble": {
-                "description": "The best McDribble you'll get in town",
-                "amount": 11.00
-            }
-        }
-    },
-    {
-        "name": "Restaurant",
-        "address": "123 SW 54 Street, Orlando, FL 4562",
-        "menu": {
-            "McD": {
-                "description": "The best McDee you'll get in town",
-                "amount": 10.88
-            },
-            "McDribble": {
-                "description": "The best McDribble you'll get in town",
-                "amount": 11.00
-            }
-        }
-    },
-    {
-        "name": "Restaurant",
-        "address": "123 SW 54 Street, Orlando, FL 4562",
-        "menu": {
-            "McD": {
-                "description": "The best McDee you'll get in town",
-                "amount": 10.88
-            },
-            "McDribble": {
-                "description": "The best McDribble you'll get in town",
-                "amount": 11.00
-            }
-        }
-    },
-    {
-        "name": "Restaurant",
-        "address": "123 SW 54 Street, Orlando, FL 4562",
-        "menu": {
-            "McD": {
-                "description": "The best McDee you'll get in town",
-                "amount": 10.88
-            },
-            "McDribble": {
-                "description": "The best McDribble you'll get in town",
-                "amount": 11.00
-            }
-        }
-    }
-];
-
 const Restaurants = () => {
-    const [selected, setSelected] = useState(restaurants[0]);
+    const [selected, setSelected] = useState(null);
+    const [vendors, setVendors] = useState([]);
 
     useEffect(() => {
-        console.log(selected);
-    }, [selected]);
+        const fetchRestaurants = async () => {
+            let res = await API.getAllVendors();
+            setSelected(res[0])
+            setVendors(res);
+        };
+
+        fetchRestaurants();
+    }, []);
 
     return (
         <PageContainer>
             <List>
                 <div>               
                     <Header>Restaurants</Header>
-                    {restaurants.map((rest, index) => {
+                    {vendors.map((rest, index) => {
                         return (
-                            <ListItem key={index} onClick={() => setSelected(restaurants[index])} selected={rest.name === selected.name}>
+                            <ListItem key={index} onClick={() => setSelected(vendors[index])} selected={rest.name === selected.name}>
                                 <h3 style={{fontWeight: 600, margin: 0, marginBottom: 10}}>{rest.name}</h3>
                                 <div style={{display: 'flex', alignItems: 'flex-start', width: "50%"}}>
                                     <TemplatePicture style={{marginLeft: 0}}/>
@@ -387,7 +300,6 @@ const Menu = ({ items }) => {
         for(const key in items) {
             
             let item = items[key];
-            console.log(item)
             menuItems.push((
                 <ListItem key={key} hoverScale={false}>
                         <div className="header">

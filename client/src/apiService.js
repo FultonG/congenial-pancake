@@ -27,9 +27,14 @@ const loginUser = (userData) => {
     return api.post('/users/login', userData).then(res => res.data)
 }
 
+const getAllVendors = () => {
+    return api.get('/vendors/all').then(res => res.data)
+}
+
 export default {
     sendScreenshot,
     createUser,
     createVendor,
-    loginUser
+    loginUser,
+    getAllVendors
 }

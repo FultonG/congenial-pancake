@@ -25,7 +25,8 @@ const CreateUser = () => {
     try {
       e.preventDefault();
       let res = await API.createVendor(vendorData);
-      console.log(res);
+      localStorage.setItem("userJWT", res.token);
+      localStorage.setItem("isVendor", true)
     } catch(e) {
       setError(e.message);
       toggleModal();

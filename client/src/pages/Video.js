@@ -51,7 +51,7 @@ const Video = () => {
       <OrderContainer>
         <VideoPlayer ref={videoRef} autoPlay muted ></VideoPlayer>
         <canvas ref={canvasRef} style={{ display: 'none', borderRadius: '10px', width: '45%', margin: '1%' }}></canvas>
-        <Card direction="column" padding="10%" width="45%" margin='1%'><h1 style={{ fontFamily: 'Montserrat', fontWeight: '300' }}>Order Details</h1>
+        <Card direction="column" padding="10%" width="45%" margin='1%'><h1 style={{ fontWeight: '300' }}>Order Details</h1>
           <div direction="row"><GrMenu></GrMenu><GrGroup></GrGroup></div>
         <Form>JOHN DOE</Form>
         <Form>1x Hamburger :)</Form>
