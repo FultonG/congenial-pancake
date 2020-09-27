@@ -8,7 +8,7 @@ import { BiUserCheck } from 'react-icons/bi';
 import styled from "styled-components";
 import API from "../apiService";
 
-function getOrders(vendorName="White Castle") {
+function getOrders(vendorName) {
   return API.getOrders(vendorName);
 }
 
@@ -39,24 +39,25 @@ const Video = () => {
   }, [constraints])
 
   useEffect(() => {
-    getOrders().then(orders => {
-      if(orders && orders.length > 0) {
+    let v = JSON.parse(localStorage.getItem("user")).vendorName;
+    getOrders(v).then(orders => {
+      if (orders && orders.length > 0) {
         // setOrders(orders)
         setOrdered(orders.filter(order => order.status === 'ordered'));
         setPreparing(orders.filter(order => order.status === 'preparing'));
         setDone(orders.filter(order => order.status === 'done'));
         setDelivered(orders.filter(order => order.status === 'delivered'));
-      
+
       }
     })
-    
-    
+
+
   }, [])
 
   const handlePolling = (e) => {
     const { clientHeight, clientWidth } = videoRef.current;
-    canvasRef.current.height = clientHeight;
-    canvasRef.current.width = clientWidth;
+    canvasRef.current.width = clientWidth * 2;
+    canvasRef.current.height = clientHeight * 2;
     canvasRef.current.getContext('2d').drawImage(videoRef.current, 0, 0);
     const url = canvasRef.current.toDataURL()
     var blobBin = atob(url.split(',')[1]);
@@ -67,21 +68,22 @@ const Video = () => {
     var file = new Blob([new Uint8Array(array)], { type: 'image/png' });
     let vendorName = JSON.parse(localStorage.getItem("user")).vendorName;
     // setInterval(() => {
-      ApiService.sendScreenshot(file, vendorName).then(res => {
-        updateOrderArrival(res.licenseTag);
-      })
+    ApiService.sendScreenshot(file, vendorName).then(res => {
+      console.log(res.licenseTag);
+      updateOrderArrival(res.licenseTag);
+    })
       .catch(err => {
         console.log("it messed up", err);
       })
     // }, 1000 * 60)
-    
+
   }
 
 
   function updateOrderArrival(licenseTag) {
     let found = null;
-    found = ordered.findIndex(order => order.licenseTag == licenseTag); 
-    if(found) {
+    found = ordered.findIndex(order => order.licenseTag == licenseTag);
+    if (found) {
       setOrdered((prev) => {
         let arr = prev.slice();
         arr[found].arrived = true;
@@ -89,10 +91,10 @@ const Video = () => {
       });
       return;
     }
-    
 
-    found = preparing.findIndex(order => order.licenseTag == licenseTag); 
-    if(found) {
+
+    found = preparing.findIndex(order => order.licenseTag == licenseTag);
+    if (found) {
       setPreparing((prev) => {
         let arr = prev.slice();
         arr[found].arrived = true;
@@ -100,10 +102,10 @@ const Video = () => {
       });
       return;
     }
-    
 
-    found = done.findIndex(order => order.licenseTag == licenseTag); 
-    if(found) {
+
+    found = done.findIndex(order => order.licenseTag == licenseTag);
+    if (found) {
       setDone((prev) => {
         let arr = prev.slice();
         arr[found].arrived = true;
@@ -111,10 +113,10 @@ const Video = () => {
       });
       return;
     }
-    
 
-    found = delivered.findIndex(order => order.licenseTag == licenseTag); 
-    if(found) {
+
+    found = delivered.findIndex(order => order.licenseTag == licenseTag);
+    if (found) {
       setDelivered((prev) => {
         let arr = prev.slice();
         arr[found].arrived = true;
@@ -122,67 +124,75 @@ const Video = () => {
       });
       return;
     }
-    
+
   }
 
   function handleDrag(id, fromStatus, toStatus) {
     let index = null, found = null;
     console.log(id, fromStatus, toStatus)
-    switch(fromStatus) {
+    switch (fromStatus) {
       case "ordered":
+        index = ordered.findIndex(order => order._id == id);
           index = ordered.findIndex(order => order._id == id); 
-          found = ordered[index];
-          setOrdered((prev) => {
-            return prev.filter(item => item._id !== id)
-          });
+        index = ordered.findIndex(order => order._id == id);
+        found = ordered[index];
+        setOrdered((prev) => {
+          return prev.filter(item => item._id !== id)
+        });
 
         break;
       case "preparing":
+        index = preparing.findIndex(order => order._id == id);
           index = preparing.findIndex(order => order._id == id); 
-          found = preparing[index];
-          setPreparing((prev) => {
-            return prev.filter(item => item._id !== id)
-          });
+        index = preparing.findIndex(order => order._id == id);
+        found = preparing[index];
+        setPreparing((prev) => {
+          return prev.filter(item => item._id !== id)
+        });
         break;
       case "done":
+        index = done.findIndex(order => order._id == id);
           index = done.findIndex(order => order._id == id); 
-          found = done[index];
-          setDone((prev) => {
-            return prev.filter(item => item._id !== id)
-          });
+        index = done.findIndex(order => order._id == id);
+        found = done[index];
+        setDone((prev) => {
+          return prev.filter(item => item._id !== id)
+        });
         break;
       case "delivered":
+        index = delivered.findIndex(order => order._id == id);
           index = delivered.findIndex(order => order._id == id); 
-          found = delivered[index];
-          setDelivered((prev) => {
-            return prev.filter(item => item._id !== id)
-          });
+        index = delivered.findIndex(order => order._id == id);
+        found = delivered[index];
+        setDelivered((prev) => {
+          return prev.filter(item => item._id !== id)
+        });
         break;
 
     }
 
-    switch(toStatus) {
+    switch (toStatus) {
       case "ordered":
         setOrdered((prev) => {
           return [...prev, found];
         });
 
-      break;
-    case "preparing":
+        break;
+      case "preparing":
         setPreparing((prev) => {
           return [...prev, found];
         });
-      break;
-    case "done":
+        break;
+      case "done":
         setDone((prev) => {
           return [...prev, found];
         });
-      break;
-    case "delivered":
+        break;
+      case "delivered":
         setDelivered((prev) => {
           return [...prev, found];
         });
-      break;
+        break;
 
     }
   }
@@ -190,31 +200,29 @@ const Video = () => {
   return (
     <>
       <OrderContainer>
-
         <VideoPlayer ref={videoRef} autoPlay muted ></VideoPlayer>
-        <canvas ref={canvasRef} style={{ display: 'none', borderRadius: '10px', width: '45%', margin: '1%' }}></canvas>
-        
-      <Button onClick={handlePolling}>Click</Button>
+        <canvas style={{borderRadius: "10px", width: "45%", margin: "1%"}}  ref={canvasRef}></canvas>
       </OrderContainer>
-      <Card style={{position: 'absolute', bottom: 0, height: '55%', display: 'flex', alignItems: 'flex-start', padding: 16}}>
-        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', flexGrow: 1, height: '100%'}}>
-            <Column>
-              <h3>Ordered</h3>
-              <ColumnCardList orders={ordered} status="ordered" onDrag={handleDrag}/>
-            </Column>
-            <Column>
-              <h3>Preparing</h3>
-              <ColumnCardList orders={preparing} status="preparing" onDrag={handleDrag}/>
-            </Column>
-            <Column>
-              <h3>Done</h3>
-              <ColumnCardList orders={done} status="done" onDrag={handleDrag}/>
-            </Column>
-            <Column>
-              <h3>Delivered</h3>
-              <ColumnCardList orders={delivered} status="delivered" onDrag={handleDrag}/>
-            </Column>
+      <Card style={{ position: 'absolute', bottom: 0, height: '55%', display: 'flex', alignItems: 'flex-start', padding: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start', flexGrow: 1, height: '100%' }}>
+          <Column>
+            <h3>Ordered</h3>
+            <ColumnCardList orders={ordered} status="ordered" onDrag={handleDrag} />
+          </Column>
+          <Column>
+            <h3>Preparing</h3>
+            <ColumnCardList orders={preparing} status="preparing" onDrag={handleDrag} />
+          </Column>
+          <Column>
+            <h3>Done</h3>
+            <ColumnCardList orders={done} status="done" onDrag={handleDrag} />
+          </Column>
+          <Column>
+            <h3>Delivered</h3>
+            <ColumnCardList orders={delivered} status="delivered" onDrag={handleDrag} />
+          </Column>
         </div>
+        <Button onClick={handlePolling}>Click</Button>
       </Card>
     </>
 
@@ -263,7 +271,7 @@ const ColumnList = styled.div`
   }
 `;
 
-const ColumnCard = styled.div(({arrived=false, delivered=false}) => `
+const ColumnCard = styled.div(({ arrived = false, delivered = false }) => `
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
   min-height: 150px;
@@ -286,7 +294,7 @@ const ColumnCardList = ({ orders, status, onDrag }) => {
   return (
     <ColumnList onDragOver={(e) => e.preventDefault()} onDrop={handleDrop}>
       {orders.map((order, index) => (
-        <DraggableCard key={order._id} {...order} status={status}/>
+        <DraggableCard key={order._id} {...order} status={status} />
       ))}
     </ColumnList>
   )
@@ -294,7 +302,7 @@ const ColumnCardList = ({ orders, status, onDrag }) => {
 
 function getOrderDetails(order) {
   let arr = [];
-  for(const key in order) {
+  for (const key in order) {
     arr.push({
       name: key,
       quantity: order[key]
@@ -302,8 +310,8 @@ function getOrderDetails(order) {
   }
   return (
     arr.map((item, index) => (
-      <div style={{display: 'flex', justifyContent: 'space-between'}} key={index}>
-        <b style={{overflowWrap: 'anywhere'}}>{item.name}</b>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }} key={index}>
+        <b style={{ overflowWrap: 'anywhere' }}>{item.name}</b>
         <span>x{item.quantity}</span>
       </div>
     ))
@@ -316,13 +324,13 @@ const DraggableCard = ({ _id, order, status, arrived }) => {
   }
   return (
     <ColumnCard draggable onDragStart={handleOnDragStart} arrived={arrived} delivered={status == "delivered"}>
-          <div style={{float: 'right', display: 'flex', alignItems: 'center', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}}>
-            {arrived ? 'Arrived' : 'Not Arrived'}
-            <BiUserCheck size={20} style={{marginLeft: 10}}/>
-            </div>
-          <h4>Order #{_id}</h4>
-          {getOrderDetails(order)}
-          
+      <div style={{ float: 'right', display: 'flex', alignItems: 'center', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+        {arrived ? 'Arrived' : 'Not Arrived'}
+        <BiUserCheck size={20} style={{ marginLeft: 10 }} />
+      </div>
+      <h4>Order #{_id}</h4>
+      {getOrderDetails(order)}
+
     </ColumnCard>
   )
 }
