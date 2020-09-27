@@ -1,8 +1,7 @@
 import React from 'react';
-import Video from './pages/Video';
-import CreateUser from './pages/CreateUser';
+import CreateVendor from './pages/CreateVendor';
 const App = () => (
- <CreateUser/>
+ <CreateVendor/>
 )
 
 export default App;

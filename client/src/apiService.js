@@ -19,7 +19,12 @@ const createUser = (userData) => {
     return api.post('/users/create', {userData}).then(res => res.data)
 }
 
+const createVendor = (vendorData) => {
+    return api.post('/vendors/create', {vendorData}).then(res => res.data)
+}
+
 export default {
     sendScreenshot,
-    createUser
+    createUser,
+    createVendor
 }
