@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import Card from "../components/Card";
+import Button from "../components/Button";
 import API from '../apiService';
 
 import { FaShoppingCart } from "react-icons/fa";
@@ -142,8 +142,8 @@ const Restaurants = () => {
                     <Header>Restaurants</Header>
                     {vendors.map((rest, index) => {
                         return (
-                            <ListItem key={index} onClick={() => setSelected(vendors[index])} selected={rest.name === selected.name}>
-                                <h3 style={{fontWeight: 600, margin: 0, marginBottom: 10}}>{rest.name}</h3>
+                            <ListItem key={index} onClick={() => setSelected(vendors[index])} selected={rest.vendorName === selected.vendorName}>
+                                <h3 style={{fontWeight: 600, margin: 0, marginBottom: 10}}>{rest.vendorName}</h3>
                                 <div style={{display: 'flex', alignItems: 'flex-start', width: "50%"}}>
                                     <TemplatePicture style={{marginLeft: 0}}/>
                                     <TemplatePicture />
@@ -160,7 +160,7 @@ const Restaurants = () => {
 
             {selected &&
             <DetailContainer style={{float: 'right'}}>
-                <Header>{selected.name}</Header>
+                <Header>{selected.vendorName}</Header>
                 <div>
                     <TemplateMap />
                     <div>{selected.address}</div>
@@ -386,11 +386,9 @@ const CartButton = styled.div`
 
 const CartCheckout = ({ itemsInCart, onCheckout }) => (
     <CartButton onClick={(e) => onCheckout(e)}>
-        <CartCard showCard={itemsInCart}>
-            <InnerCard>
+            <Button>
                 Checkout <FaShoppingCart style={{margin: '0px 5px'}}/>
-            </InnerCard>
-        </CartCard>
+            </Button>
     </CartButton>
     
 )
