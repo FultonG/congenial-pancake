@@ -10,5 +10,10 @@ const Button = styled.button`
   min-width: 150px;
   margin: 32px;
   color: white;
+  &:hover {
+    // background: linear-gradient(90deg, rgba(162,212,217,1) 0%, rgba(0,212,255,1) 100%);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+  }
 `;
 export default Button;

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import Card from "../components/Card";
-
+import styled from "styled-components"
 import { FaShoppingCart } from "react-icons/fa";
+import { useHistory } from "react-router-dom";
 
 const PageContainer = styled.div`
     height: 100vh;
@@ -47,7 +46,7 @@ const List = styled.ul(() => `
 `
 );
 
-const ListItem = styled.li(({hoverScale=true, selected}) => `
+const ListItem = styled.li(({hoverScale=true, selected, cursor='normal'}) => `
     width: 100%;
     padding: 10px;
     border-top: 1px solid #9fe9ff;
@@ -56,8 +55,8 @@ const ListItem = styled.li(({hoverScale=true, selected}) => `
     flex-direction: column;
     transition: transform .4s;
     background: ${selected ? "linear-gradient(90deg, rgba(162,212,217,0.15) 0%, rgba(0,212,255,0.15) 100%)" : "inherit"};
+    cursor: ${cursor};
     &:hover {
-        cursor: pointer;
         // box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
         // background-color: rgba(255, 153, 43, 0.10);
         background: linear-gradient(90deg, rgba(162,212,217,0.1) 0%, rgba(0,212,255,0.1) 100%);
@@ -228,7 +227,9 @@ const Restaurants = () => {
                     <Header>Restaurants</Header>
                     {restaurants.map((rest, index) => {
                         return (
-                            <ListItem key={index} onClick={() => setSelected(restaurants[index])} selected={rest.name === selected.name}>
+                            <ListItem key={index} onClick={() => setSelected(restaurants[index])} 
+                            selected={rest.name === selected.name}
+                            cursor={'pointer'}>
                                 <h3 style={{fontWeight: 600, margin: 0, marginBottom: 10}}>{rest.name}</h3>
                                 <div style={{display: 'flex', alignItems: 'flex-start', width: "50%"}}>
                                     <TemplatePicture style={{marginLeft: 0}}/>
@@ -255,7 +256,7 @@ const Restaurants = () => {
                 <Header fontSize={14}></Header>
                 <hr />
                 <h3>Menu</h3>
-                <Menu items={selected.menu} />
+                <Menu items={selected.menu}/>
 
             </DetailContainer>
             }
@@ -267,13 +268,16 @@ const Restaurants = () => {
 const QuantityInput = styled.input`
     display: grid;
     place-items: center;
-    background: white;
+    // background: white;
+    background: inherit;
     font-size: 14px;
     font-weight: 600;
     border: none;
-    height: 35px;
-    width: 35px;
-    padding-left: 10px;
+    height: 30px;
+    width: 30px;
+    line-height: 15px;
+    padding-left: 8px;
+    padding-top: 5px;
     border-radius: 15px;
     &:hover {
     }
@@ -290,12 +294,13 @@ const QuantityStep = styled.span`
     place-items: center;
     font-size: 18px;
     font-weight: 600;
+    line-height: 12px;
     border: none;
-    height: 25px;
-    width: 25px;
+    height: 24px;
+    width: 24px;
     margin: 0px 10px;
     border-radius: 25px;
-    // padding-left: 3px;
+    cursor: pointer;
     &:hover {
         background: linear-gradient(90deg, rgba(162,212,217,0.2) 0%, rgba(0,212,255,0.2) 100%);
         font-weight: 800;
@@ -353,6 +358,8 @@ const MenuContainer = styled.div`
 `;
 
 const Menu = ({ items }) => {
+    let history = useHistory();
+
     const [cart, setCart] = useState({});
 
     function initCart() {
@@ -407,13 +414,18 @@ const Menu = ({ items }) => {
         return menuItems;
         
     }
+
+    function goToCheckout() {
+        history.push('/checkout', { cart: cart, menu: items} );
+    }
+
     return (
         <MenuContainer>
             <ul style={{listStyleType: "none", padding: 0, margin: 0}}>
                 
             {returnMenu()}
             </ul>
-            <CartCheckout itemsInCart/>
+            <CartCheckout itemsInCart onCheckout={goToCheckout}/>
             <div style={{height: '45px'}}></div>
         </MenuContainer> 
     )
@@ -450,14 +462,24 @@ const InnerCard = styled.div`
     text-transform: uppercase;
 
 `;
-const CartCheckout = ({ itemsInCart }) => (
-    <div style={{ display: 'flex', justifyContent: "center"}}>
+
+const CartButton = styled.div`
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    &:hover: {
+
+    }
+`;
+
+const CartCheckout = ({ itemsInCart, onCheckout }) => (
+    <CartButton onClick={(e) => onCheckout(e)}>
         <CartCard showCard={itemsInCart}>
-        <InnerCard>
-            Checkout <FaShoppingCart style={{margin: '5px 0px'}}/>
-        </InnerCard>
-    </CartCard>
-    </div>
+            <InnerCard>
+                Checkout <FaShoppingCart style={{margin: '0px 5px'}}/>
+            </InnerCard>
+        </CartCard>
+    </CartButton>
     
 )
 

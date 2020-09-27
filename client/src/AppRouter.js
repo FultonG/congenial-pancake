@@ -10,6 +10,7 @@ import RegisterPage from "./pages/CreateUser"
 import RegisterVendor from './pages/CreateVendor';
 import LoginPage from "./pages/LoginPage"
 import Restaurants from "./pages/Restaurants";
+import Checkout from "./pages/Checkout";
 
 
 const AppRouter = () =>
@@ -33,7 +34,7 @@ const AppRouter = () =>
             <Restaurants />
           </PrivateRoute>
           <PrivateRoute path="/checkout">
-            {/* <Checkout /> */}
+            <Checkout />
           </PrivateRoute>
           <VendorRoute path="/vendor">
             <Video />
