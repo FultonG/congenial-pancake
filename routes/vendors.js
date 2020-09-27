@@ -3,6 +3,7 @@ const Vendor = require("../models/vendor");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
+const vendor = require("../models/vendor");
 const capitalAPI = process.env.CAPITALONE_KEY;
 const saltRounds = 10;
 
@@ -12,6 +13,7 @@ router.post("/create", async (req, res) => {
     vendorName,
     password,
     merchant_id,
+    menu,
     ...merchant
   } = req.body.vendorData;
 
@@ -54,36 +56,90 @@ router.post("/create", async (req, res) => {
     })
     .catch((err) => res.status(400).send({ err }));
 
-  const user = await Vendor.create({
+  await Vendor.create({
     username,
     vendorName,
     password: hash,
     ...merchantData,
   });
-  const token = jwt.sign({ username, vendorName }, process.env.JWT_SECRET, {
+
+  const vendor = await Vendor.findOne({ username }).select({
+    _id: 0,
+    __v: 0,
+    password: 0,
+  });
+  const token = jwt.sign({ vendor }, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });
-  return res.send({ user, token });
+  return res.send({ vendor, token });
 });
 
 router.post("/login", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  const user = await Vendor.findOne({ username });
-  if (!user) {
+  const vendor = await Vendor.findOne({ username }).select({
+    _id: 0,
+    __v: 0,
+    password: 0,
+  });
+  if (!vendor) {
     return res.status(400).send({ msg: "Username not found" });
   }
 
-  const compareRes = await bcrypt.compare(password, user.password);
-  if (!compareRes) {
+  const hashedPwd = await Vendor.findOne({ username });
+  const comparePwd = await bcrypt.compare(password, hashedPwd.password);
+  if (!comparePwd) {
     return res.status(400).send({ msg: "Incorrect password" });
   }
 
   const token = jwt.sign({ username }, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });
-  return res.send({ user, token });
+  return res.send({ vendor, token });
+});
+
+router.get("/menu/:vendor", async (req, res) => {
+  const vendorName = req.params.vendor;
+
+  console.log(vendorName);
+  const vendor = await Vendor.findOne({ vendorName }).select({
+    _id: 0,
+    __v: 0,
+  });
+  res.send(vendor.menu || { msg: "This vendor does not have a menu" });
+});
+
+router.put("/menu/edit", async (req, res) => {
+  const vendorName = req.body.vendorName;
+  const addItems = req.body.addItems;
+  const removeItems = req.body.removeItems;
+
+  let vendor = await Vendor.findOne({ vendorName });
+
+  if (removeItems) {
+    const menu = vendor.menu;
+    for (const item in menu) {
+      if (removeItems[item]) {
+        delete menu[item];
+      }
+    }
+
+    await Vendor.updateOne({ vendorName }, { menu });
+  }
+
+  if (addItems) {
+    const menu = { ...vendor.menu, ...addItems };
+    await Vendor.updateOne({ vendorName }, { menu });
+  }
+
+  vendor = await Vendor.findOne({ vendorName });
+  res.send(vendor.menu);
+});
+
+router.get("/all", async (req, res) => {
+  const vendors = await Vendor.find({}).select({ _id: 0, __v: 0, password: 0 });
+  res.send(vendors);
 });
 
 module.exports = router;

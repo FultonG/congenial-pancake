@@ -19,7 +19,27 @@ const createUser = (userData) => {
     return api.post('/users/create', {userData}).then(res => res.data)
 }
 
+const createVendor = (vendorData) => {
+    return api.post('/vendors/create', {vendorData}).then(res => res.data)
+}
+
+const loginUser = (userData) => {
+    return api.post('/users/login', userData).then(res => res.data)
+}
+
+const getAllVendors = () => {
+    return api.get('/vendors/all').then(res => res.data)
+}
+
+const checkout = (checkoutData) => {
+    return api.post('/finance/create', checkoutData).then(res => res.data)
+}
+
 export default {
     sendScreenshot,
-    createUser
+    createUser,
+    createVendor,
+    loginUser,
+    getAllVendors,
+    checkout
 }

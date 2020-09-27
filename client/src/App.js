@@ -1,8 +1,8 @@
 import React from 'react';
-import Video from './pages/Video';
-import CreateUser from './pages/CreateUser';
+import AppRouter from './AppRouter';
+
 const App = () => (
- <CreateUser/>
+    <AppRouter />
 )
 
 export default App;
