@@ -15,6 +15,7 @@ router.post("/create", async (req, res) => {
     customer_id,
     account_id,
     balance,
+    license_tag,
     ...customer
   } = req.body.userData;
 
@@ -74,6 +75,7 @@ router.post("/create", async (req, res) => {
     username,
     password: hash,
     account_id,
+    license_tag,
     balance: account.balance,
   });
 

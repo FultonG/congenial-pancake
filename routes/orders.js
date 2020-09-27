@@ -7,7 +7,7 @@ router.get("/all", auth.authJWT, async (req, res) => {
   const status = req.query.status || null;
   const vendor = req.query.vendor || null;
 
-  const orders = await Order.find({ vendor }).select({
+  const orders = await Order.find({ vendorName: vendor }).select({
     __v: 0,
   });
   if (status) {
@@ -34,7 +34,6 @@ router.post("/create", auth.authJWT, async (req, res) => {
   const licenseTag = req.body.licenseTag;
   const ordered = req.body.order;
 
-  console.log(ordered);
   const { _id } = await Order.create({
     vendorName,
     licenseTag,

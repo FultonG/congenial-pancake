@@ -166,7 +166,7 @@ const Restaurants = () => {
                 <Header fontSize={14}></Header>
                 <hr />
                 <h3>Menu</h3>
-                <Menu items={selected.menu} vendorID={selected.merchant_id}/>
+                <Menu items={selected.menu} vendor={selected}/>
 
             </DetailContainer>
             }
@@ -267,7 +267,7 @@ const MenuContainer = styled.div`
 }
 `;
 
-const Menu = ({ items, vendorID }) => {
+const Menu = ({ items, vendor }) => {
     let history = useHistory();
 
     const [cart, setCart] = useState({});
@@ -325,7 +325,7 @@ const Menu = ({ items, vendorID }) => {
     }
 
     function goToCheckout() {
-        history.push('/checkout', { cart: cart, menu: items, vendorID} );
+        history.push('/checkout', { cart: cart, menu: items, vendor: vendor });
     }
 
     return (
