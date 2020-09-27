@@ -7,7 +7,6 @@ router.get("/all", auth.authJWT, async (req, res) => {
   const status = req.query.status || null;
 
   const orders = await Order.find({}).select({
-    _id: 0,
     __v: 0,
   });
   if (status) {
@@ -24,7 +23,6 @@ router.get("/get/:tag/:vendor", auth.authJWT, async (req, res) => {
   const vendorName = req.params.vendor;
 
   const order = await Order.findOne({ vendorName, licenseTag }).select({
-    _id: 0,
     __v: 0,
   });
   return res.send(order);
@@ -33,25 +31,18 @@ router.get("/get/:tag/:vendor", auth.authJWT, async (req, res) => {
 router.post("/create", auth.authJWT, async (req, res) => {
   const vendorName = req.body.vendorName;
   const licenseTag = req.body.licenseTag;
-
-  const orders = await Order.find({ vendorName, licenseTag }).select({
-    _id: 0,
+  const ordered = req.body.order;
+  console.log(ordered);
+  await Order.create({
+    vendorName,
+    licenseTag,
+    status: "ordered",
+    order: ordered,
+  });
+  const order = await Order.findOne({ vendorName, licenseTag }).select({
     __v: 0,
   });
-  if (!orders.length) {
-    await Order.create({
-      vendorName,
-      licenseTag,
-      status: "ordered",
-    });
-    const order = await Order.findOne({ vendorName, licenseTag }).select({
-      _id: 0,
-      __v: 0,
-    });
-    res.send(order);
-  } else {
-    return res.send({ msg: "Order already exists" });
-  }
+  res.send(order);
 });
 
 router.put("/status", auth.authJWT, async (req, res) => {
@@ -61,7 +52,6 @@ router.put("/status", auth.authJWT, async (req, res) => {
 
   await Order.updateOne({ licenseTag, vendorName }, { status });
   const order = await Order.findOne({ licenseTag, vendorName }).select({
-    _id: 0,
     __v: 0,
   });
 

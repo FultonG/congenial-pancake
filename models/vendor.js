@@ -7,6 +7,7 @@ const VendorSchema = mongoose.Schema({
   merchant_id: { type: String, required: false },
   name: { type: String, required: true },
   creation_date: { type: String, required: false },
+  menu: { type: Object, required: false },
 });
 
 const Vendor = (module.exports = mongoose.model(

@@ -3,6 +3,7 @@ const Vendor = require("../models/vendor");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
+const vendor = require("../models/vendor");
 const capitalAPI = process.env.CAPITALONE_KEY;
 const saltRounds = 10;
 
@@ -12,6 +13,7 @@ router.post("/create", async (req, res) => {
     vendorName,
     password,
     merchant_id,
+    menu,
     ...merchant
   } = req.body.vendorData;
 
@@ -95,6 +97,28 @@ router.post("/login", async (req, res) => {
     expiresIn: "24h",
   });
   return res.send({ vendor, token });
+});
+
+router.get("/menu/:vendor", async (req, res) => {
+  const vendorName = req.params.vendor;
+
+  console.log(vendorName);
+  const vendor = await Vendor.findOne({ vendorName }).select({
+    _id: 0,
+    __v: 0,
+  });
+  res.send(vendor.menu || { msg: "This vendor does not have a menu" });
+});
+
+router.put("/menu/add", async (req, res) => {
+  const vendorName = req.body.vendorName;
+  const newItem = req.body.newItem;
+
+  let vendor = await Vendor.findOne({ vendorName });
+  const menu = { ...vendor.menu, ...newItem };
+  await Vendor.updateOne({ vendorName }, { menu });
+  vendor = await Vendor.findOne({ vendorName });
+  res.send(vendor.menu);
 });
 
 module.exports = router;
