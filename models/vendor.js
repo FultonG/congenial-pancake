@@ -6,19 +6,8 @@ const VendorSchema = mongoose.Schema({
   password: { type: String, required: true },
   merchant_id: { type: String, required: false },
   name: { type: String, required: true },
-  category: { type: String, required: true },
   creation_date: { type: String, required: false },
-  address: {
-    street_number: { type: String, required: true },
-    street_name: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zip: { type: String, required: true },
-  },
-  geocode: {
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true },
-  },
+  menu: { type: Object, required: false },
 });
 
 const Vendor = (module.exports = mongoose.model(
