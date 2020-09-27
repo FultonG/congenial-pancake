@@ -11,7 +11,7 @@ router.post("/create", auth.authJWT, (req, res) => {
   const date = new Date();
   const year = String(date.getUTCFullYear());
   const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDay()).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
   const purchase_date = `${year}-${month}-${day}`;
 
   const payload = { merchant_id, amount, purchase_date, medium: "balance" };
