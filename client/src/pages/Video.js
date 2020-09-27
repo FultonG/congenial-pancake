@@ -22,7 +22,7 @@ const Video = () => {
     }
 
     fetchMedia()
-  }, [])
+  }, [constraints])
 
   const handleClick = (e) => {
     const { clientHeight, clientWidth } = videoRef.current;

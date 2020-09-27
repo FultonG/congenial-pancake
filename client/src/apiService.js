@@ -15,6 +15,11 @@ const sendScreenshot = (file) => {
         .then(res => res.data);
 }
 
+const createUser = (userData) => {
+    return api.post('/users/create', {userData}).then(res => res.data)
+}
+
 export default {
-    sendScreenshot
+    sendScreenshot,
+    createUser
 }
