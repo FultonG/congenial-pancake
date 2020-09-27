@@ -61,6 +61,7 @@ const CreateUser = () => {
         <Input placeholder="State" value={userData.address.state} onChange={(e) => updatePayload('state', e.currentTarget.value, true)}></Input>
         <Input placeholder="Zip" value={userData.address.zip} onChange={(e) => updatePayload('zip', e.currentTarget.value, true)}></Input>
         <ButtonContainer>
+          <a style={{alignSelf: 'center', margin: '32px 16px'}} href="/login">Already have an account? Click here.</a>
           <Button type="submit">Create</Button>
         </ButtonContainer>
         <Modal
