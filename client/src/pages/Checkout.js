@@ -149,8 +149,6 @@ const Checkout = ({ }) => {
   let location = useLocation();
   let history = useHistory();
   useEffect(() => {
-
-    console.log(location.state);
     //Set new list of items for order receipt
     const newList = [];
     for(const key in location.state.cart) {
@@ -174,7 +172,7 @@ const Checkout = ({ }) => {
     try {
       e.preventDefault();
       let res = await API.checkout(checkoutData);
-      console.log(res);
+      history.push('/status', {...res}); 
     } catch (e) {
       setError(e.message);
       toggleModal();
