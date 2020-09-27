@@ -27,6 +27,18 @@ router.post("/create", async (req, res) => {
     return res.status(400).send({ msg: "Username taken" });
   }
 
+  if (!username || username.trim().length < 6) {
+    return res
+      .status(400)
+      .send({ msg: "Username length must be greater than 5" });
+  }
+
+  if (password.length < 6) {
+    return res
+      .status(400)
+      .send({ msg: "Password length must be greater than 5" });
+  }
+
   await axios
     .post(
       `http://api.reimaginebanking.com/customers?key=${capitalAPI}`,
@@ -57,7 +69,7 @@ router.post("/create", async (req, res) => {
     .catch((err) => res.status(400).send({ err }));
 
   const hash = await bcrypt.hash(password, saltRounds);
-  const user = await User.create({
+  await User.create({
     ...customer,
     username,
     password: hash,
@@ -65,6 +77,11 @@ router.post("/create", async (req, res) => {
     balance: account.balance,
   });
 
+  const user = await User.findOne({ username }).select({
+    _id: 0,
+    __v: 0,
+    password: 0,
+  });
   const token = jwt.sign({ user }, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });
@@ -75,8 +92,17 @@ router.post("/login", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
-  const user = await User.findOne({ username });
-  const comparePwd = await bcrypt.compare(password.user.password);
+  const user = await User.findOne({ username }).select({
+    _id: 0,
+    __v: 0,
+    password: 0,
+  });
+  if (!user) {
+    res.status(400).send({ msg: "Username not found" });
+  }
+
+  const hashedPwd = await User.findOne({ username });
+  const comparePwd = await bcrypt.compare(password, hashedPwd.password);
   if (!comparePwd) {
     return res.status(400).send({ msg: "Incorrect password" });
   }
