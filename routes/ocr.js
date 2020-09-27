@@ -14,14 +14,14 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 var cloudmersive = require("../cloudmersive");
-var Vendor = require("../models/user");
+var Orders = require("../models/order");
 /**
  * Receives a base64 image to read with tesseract.
  */
 router.post("/:vendorName/detect", upload.single("plate"), function (req, res) {
     let name = req.params.vendorName;
-
-    Vendor.find({ vendorName: name }, function(err, vendors) {
+    console.log(name);
+    Orders.find({ vendorName: name }, function(err, vendors) {
         if(err)
             res.status(500).send(err);
 

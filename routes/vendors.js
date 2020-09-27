@@ -110,15 +110,36 @@ router.get("/menu/:vendor", async (req, res) => {
   res.send(vendor.menu || { msg: "This vendor does not have a menu" });
 });
 
-router.put("/menu/add", async (req, res) => {
+router.put("/menu/edit", async (req, res) => {
   const vendorName = req.body.vendorName;
-  const newItem = req.body.newItem;
+  const addItems = req.body.addItems;
+  const removeItems = req.body.removeItems;
 
   let vendor = await Vendor.findOne({ vendorName });
-  const menu = { ...vendor.menu, ...newItem };
-  await Vendor.updateOne({ vendorName }, { menu });
+
+  if (removeItems) {
+    const menu = vendor.menu;
+    for (const item in menu) {
+      if (removeItems[item]) {
+        delete menu[item];
+      }
+    }
+
+    await Vendor.updateOne({ vendorName }, { menu });
+  }
+
+  if (addItems) {
+    const menu = { ...vendor.menu, ...addItems };
+    await Vendor.updateOne({ vendorName }, { menu });
+  }
+
   vendor = await Vendor.findOne({ vendorName });
   res.send(vendor.menu);
+});
+
+router.get("/all", async (req, res) => {
+  const vendors = await Vendor.find({}).select({ _id: 0, __v: 0, password: 0 });
+  res.send(vendors);
 });
 
 module.exports = router;

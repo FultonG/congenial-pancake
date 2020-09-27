@@ -8,6 +8,7 @@ const UserSchema = mongoose.Schema({
   customer_id: { type: String, required: false },
   account_id: { type: String, required: false },
   balance: { type: Number, required: false },
+  license_tag: { type: String, required: true },
   address: {
     street_number: { type: String, required: true },
     street_name: { type: String, required: true },

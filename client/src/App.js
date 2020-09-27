@@ -1,7 +1,8 @@
 import React from 'react';
-import Video from './pages/Video';
+import AppRouter from './AppRouter';
+
 const App = () => (
- <Video></Video>
+    <AppRouter />
 )
 
 export default App;

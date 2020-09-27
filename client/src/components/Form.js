@@ -25,13 +25,13 @@ export const Input = styled.input`
   border-radius: 5px 5px 5px 5px;
   min-height: 47px;
   padding: 16px;
-  width: 100%;
+  width: ${({width}) => width? width: '100%'};
   color: #3d4459;
   margin: 5px 0px;
 `;
 
 export const ButtonContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin: 10px 0px;
 `;
